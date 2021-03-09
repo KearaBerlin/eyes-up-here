@@ -1,5 +1,6 @@
 import logo from './logo.svg';
 import './App.css';
+import { AddNotificationMethod } from './addNotification';
 
 function App() {
   return (
@@ -61,7 +62,7 @@ function App() {
                </select>
                <input type="text" name="notification" id="notification" />
 
-               <input id="addNotificationMethod" type="button" value="+Add" />
+               <button onClick={AddNotificationMethod}>+Add</button>
                <br/>
            </div>
 
