@@ -26,7 +26,6 @@ class App extends React.Component {
 
   async detectFace() {
     let image_file_name = "detection1.jpg";
-    let face = this.state.client.face;
     const detectedFace = await this.state.client.face.detectWithUrl(
         this.state.image_base_url + image_file_name,
         {
@@ -37,30 +36,32 @@ class App extends React.Component {
     console.log (detectedFace.length + " face(s) detected from image " + image_file_name + ".");
     console.log("Face attributes for face(s) in " + image_file_name + ":");
 
-    // Get emotion on the face
-    let emotions = "";
-    let emotion_threshold = 0.0;
-    if (face.faceAttributes.emotion.anger > emotion_threshold) { emotions += "anger, "; }
-    if (face.faceAttributes.emotion.contempt > emotion_threshold) { emotions += "contempt, "; }
-    if (face.faceAttributes.emotion.disgust > emotion_threshold) { emotions +=  "disgust, "; }
-    if (face.faceAttributes.emotion.fear > emotion_threshold) { emotions +=  "fear, "; }
-    if (face.faceAttributes.emotion.happiness > emotion_threshold) { emotions +=  "happiness, "; }
-    if (face.faceAttributes.emotion.neutral > emotion_threshold) { emotions +=  "neutral, "; }
-    if (face.faceAttributes.emotion.sadness > emotion_threshold) { emotions +=  "sadness, "; }
-    if (face.faceAttributes.emotion.surprise > emotion_threshold) { emotions +=  "surprise, "; }
-    if (emotions.length > 0) {
-        console.log ("Emotions: " + emotions.slice (0, -2));
-    }
-    else {
-        console.log ("No emotions detected.");
-    }
+    detectedFace.forEach(async function (face) {
+      // Get emotion on the face
+      let emotions = "";
+      let emotion_threshold = 0.0;
+      if (face.faceAttributes.emotion.anger > emotion_threshold) { emotions += "anger, "; }
+      if (face.faceAttributes.emotion.contempt > emotion_threshold) { emotions += "contempt, "; }
+      if (face.faceAttributes.emotion.disgust > emotion_threshold) { emotions +=  "disgust, "; }
+      if (face.faceAttributes.emotion.fear > emotion_threshold) { emotions +=  "fear, "; }
+      if (face.faceAttributes.emotion.happiness > emotion_threshold) { emotions +=  "happiness, "; }
+      if (face.faceAttributes.emotion.neutral > emotion_threshold) { emotions +=  "neutral, "; }
+      if (face.faceAttributes.emotion.sadness > emotion_threshold) { emotions +=  "sadness, "; }
+      if (face.faceAttributes.emotion.surprise > emotion_threshold) { emotions +=  "surprise, "; }
+      if (emotions.length > 0) {
+          console.log ("Emotions: " + emotions.slice (0, -2));
+      }
+      else {
+          console.log ("No emotions detected.");
+      }
 
-    // get head pose
-    // Get more attributes
-    console.log("Head pose:");
-    console.log("  Pitch: " + face.faceAttributes.headPose.pitch);
-    console.log("  Roll: " + face.faceAttributes.headPose.roll);
-    console.log("  Yaw: " + face.faceAttributes.headPose.yaw);
+      // get head pose
+      // Get more attributes
+      console.log("Head pose:");
+      console.log("  Pitch: " + face.faceAttributes.headPose.pitch);
+      console.log("  Roll: " + face.faceAttributes.headPose.roll);
+      console.log("  Yaw: " + face.faceAttributes.headPose.yaw);
+    });
   }
 
   render() {
