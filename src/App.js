@@ -9,7 +9,7 @@ class App extends React.Component {
     const msRest = require("@azure/ms-rest-js");
     const Face = require("@azure/cognitiveservices-face");
 
-    const key = "7e9612f79e204cd2b45ca8b5394acdd7";
+    const key = "7d3f9afc15424d898bc6fec3cf2780e4";
     const endpoint = "https://eyesupherefaceinstance.cognitiveservices.azure.com/";
 
     // authenticate the client for azure quickstart
