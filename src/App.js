@@ -6,7 +6,7 @@ function App() {
     <div className="App">
     <div id="wrapper">
     <header>
-   <h1>Eyes Up Here Settings</h1>
+      <h1>Eyes Up Here Settings</h1>
     </header>
 
     <article>
