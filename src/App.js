@@ -2,6 +2,7 @@ import logo from './logo.svg';
 import './App.css';
 import { AddNotificationMethod } from './addNotification';
 
+
 function App() {
   return (
     <div className="App">
@@ -11,7 +12,7 @@ function App() {
     </header>
 
     <article>
-       <form id="settings" action="settings.html" method="POST">
+       <form>
            <p>
                Attention Prompt Customization - How would you like the app to regain your student's attention?
            </p>
