@@ -27,8 +27,11 @@ class App extends React.Component {
       //audio: true,
     }
     navigator.mediaDevices.getUserMedia(constraints).then((stream) => {
-      console.log("stream: ");
-      console.log(stream);
+      let videoTrack = stream.getVideoTracks()[0];
+      const imageCapture = new ImageCapture(videoTrack);
+      imageCapture.grabFrame().then(function(imageBitmap) {
+        console.log('frame: ', imageBitmap);
+      });
     })
 
     // detect faces
