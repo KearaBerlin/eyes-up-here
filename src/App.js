@@ -21,22 +21,33 @@ class App extends React.Component {
       client: client
     }
 
-    this.detectFace();
+    // get video
+    const constraints = {
+      video: true,
+      //audio: true,
+    }
+    navigator.mediaDevices.getUserMedia(constraints).then((stream) => {
+      console.log("stream: ");
+      console.log(stream);
+    })
+
+    // detect faces
+    this.detectFaces();
   }
 
-  async detectFace() {
+  async detectFaces() {
     let image_file_name = "detection1.jpg";
-    const detectedFace = await this.state.client.face.detectWithUrl(
+    const detectedFaces = await this.state.client.face.detectWithUrl(
         this.state.image_base_url + image_file_name,
         {
           returnFaceAttributes: ["Emotion", "HeadPose"],
           detectionModel: "detection_01"
         }
       );
-    console.log (detectedFace.length + " face(s) detected from image " + image_file_name + ".");
+    console.log (detectedFaces.length + " face(s) detected from image " + image_file_name + ".");
     console.log("Face attributes for face(s) in " + image_file_name + ":");
 
-    detectedFace.forEach(async function (face) {
+    detectedFaces.forEach(async function (face) {
       // Get emotion on the face
       let emotions = "";
       let emotion_threshold = 0.0;
