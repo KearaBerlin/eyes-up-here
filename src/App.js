@@ -4,6 +4,7 @@ import React from 'react';
 class App extends React.Component {
   constructor(props) {
     super(props);
+    this.detectFaces = this.detectFaces.bind(this);
 
     // constants for Azure quickstart
     const msRest = require("@azure/ms-rest-js");
@@ -27,28 +28,36 @@ class App extends React.Component {
       //audio: true,
     }
     navigator.mediaDevices.getUserMedia(constraints).then((stream) => {
+      console.log('got user media');
       let videoTrack = stream.getVideoTracks()[0];
       const imageCapture = new ImageCapture(videoTrack);
-      imageCapture.grabFrame().then(function(imageBitmap) {
-        console.log('frame: ', imageBitmap);
+      imageCapture.grabFrame().then((imageBitmap) => {
+        console.log('grabbed a frame');
+
+        // try turning image frame into blob
+        let canvas = document.createElement('canvas');
+        canvas.width = imageBitmap.width;
+        canvas.height = imageBitmap.height;
+        let context = canvas.getContext('2d');
+        context.drawImage(imageBitmap, 0, 0);
+        canvas.toBlob((blob) => {
+          // detect faces
+          console.log('trying to detect a face');
+          this.detectFaces(blob);
+        })
       });
     })
-
-    // detect faces
-    this.detectFaces();
   }
 
-  async detectFaces() {
-    let image_file_name = "detection1.jpg";
-    const detectedFaces = await this.state.client.face.detectWithUrl(
-        this.state.image_base_url + image_file_name,
+  async detectFaces(blob) {
+    const detectedFaces = await this.state.client.face.detectWithStream(
+        blob,
         {
           returnFaceAttributes: ["Emotion", "HeadPose"],
           detectionModel: "detection_01"
         }
       );
-    console.log (detectedFaces.length + " face(s) detected from image " + image_file_name + ".");
-    console.log("Face attributes for face(s) in " + image_file_name + ":");
+    console.log (detectedFaces.length + " face(s) detected");
 
     detectedFaces.forEach(async function (face) {
       // Get emotion on the face
