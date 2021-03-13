@@ -64,6 +64,26 @@ class App extends React.Component {
     });
   }
 
+  function audioPrompt() {
+   
+    function playBuzzer() {
+        const buzzer = new Audio("https://www.fesliyanstudios.com/play-mp3/4386");
+        buzzer.play();
+    }
+    
+    let beginTimer = setTimeout(playBuzzer, 30000);
+         
+    let cancelTimer = clearTimeout(beginTimer);
+    
+    if (!detectFace || face.faceAttributes.headPose.pitch > 45 || face.faceAttributes.headPose.roll > 45 || face.faceAttributes.headPose.yaw > 45) {
+        beginTimer;
+        if (detectFace && face.faceAttributes.headPose.pitch <= 45 && face.faceAttributes.headPose.roll <= 45 && face.faceAttributes.headPose.yaw <= 45) {
+        cancelTimer; 
+        } 
+    }     
+}
+
+
   render() {
     return (
       <div className="App">
