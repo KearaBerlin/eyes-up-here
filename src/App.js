@@ -5,6 +5,7 @@ class App extends React.Component {
   constructor(props) {
     super(props);
     this.detectFaces = this.detectFaces.bind(this);
+    this.processFrame = this.processFrame.bind(this);
 
     // constants for Azure quickstart
     const msRest = require("@azure/ms-rest-js");
@@ -21,32 +22,69 @@ class App extends React.Component {
       image_base_url: "https://csdx.blob.core.windows.net/resources/Face/Images/",
       client: client
     }
+  }
 
+  async componentDidMount() {
+    this.monitorVideo();
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.timer);
+  }
+
+  monitorVideo() {
     // get video
     const constraints = {
-      video: true,
-      //audio: true,
+      video: true
     }
-    navigator.mediaDevices.getUserMedia(constraints).then((stream) => {
-      console.log('got user media');
+    navigator.mediaDevices.getUserMedia(constraints)
+    .then((stream) => {
       let videoTrack = stream.getVideoTracks()[0];
-      const imageCapture = new ImageCapture(videoTrack);
-      imageCapture.grabFrame().then((imageBitmap) => {
-        console.log('grabbed a frame');
+      let imageCapture = new ImageCapture(videoTrack);
 
-        // try turning image frame into blob
+      // regularly send a frame to Azure Face for processing
+      this.timer = setInterval(() => {
+        this.processFrame(imageCapture);
+      }, 1000);
+
+    })
+  }
+
+  processFrame(imageCapture) {
+
+    // sometimes the track becomes muted. If so, stop the track
+    // and get it again.
+    let track = imageCapture.track;
+    if (track.muted) {
+      track.stop();
+      clearInterval(this.timer);
+      this.monitorVideo();
+    }
+    // check ready state before grabbing frame to
+    // avoid errors from too many frames grabbed quickly
+    if (track.readyState === 'live' && track.enabled && !track.muted) {
+
+      // grab a still image from video track
+      imageCapture.grabFrame()
+      .then((imageBitmap) => {
+
+        // convert image frame into blob
         let canvas = document.createElement('canvas');
         canvas.width = imageBitmap.width;
         canvas.height = imageBitmap.height;
         let context = canvas.getContext('2d');
         context.drawImage(imageBitmap, 0, 0);
         canvas.toBlob((blob) => {
+
           // detect faces
-          console.log('trying to detect a face');
           this.detectFaces(blob);
+
         })
+      })
+      .catch(e => {
+          console.log(e);
       });
-    })
+    }
   }
 
   async detectFaces(blob) {
@@ -79,7 +117,6 @@ class App extends React.Component {
       }
 
       // get head pose
-      // Get more attributes
       console.log("Head pose:");
       console.log("  Pitch: " + face.faceAttributes.headPose.pitch);
       console.log("  Roll: " + face.faceAttributes.headPose.roll);
