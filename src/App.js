@@ -102,48 +102,26 @@ class App extends React.Component {
     const detectedFaces = await this.state.client.face.detectWithStream(
         blob,
         {
-          returnFaceAttributes: ["Emotion", "HeadPose"],
+          returnFaceAttributes: ["HeadPose"],
           detectionModel: "detection_01"
         }
       );
     console.log (detectedFaces.length + " face(s) detected");
+    const detectFace = detectedFaces.length > 0;
 
     detectedFaces.forEach(async (face) => {
-      // Get emotion on the face
-      let emotions = "";
-      let emotion_threshold = 0.0;
-      if (face.faceAttributes.emotion.anger > emotion_threshold) { emotions += "anger, "; }
-      if (face.faceAttributes.emotion.contempt > emotion_threshold) { emotions += "contempt, "; }
-      if (face.faceAttributes.emotion.disgust > emotion_threshold) { emotions +=  "disgust, "; }
-      if (face.faceAttributes.emotion.fear > emotion_threshold) { emotions +=  "fear, "; }
-      if (face.faceAttributes.emotion.happiness > emotion_threshold) { emotions +=  "happiness, "; }
-      if (face.faceAttributes.emotion.neutral > emotion_threshold) { emotions +=  "neutral, "; }
-      if (face.faceAttributes.emotion.sadness > emotion_threshold) { emotions +=  "sadness, "; }
-      if (face.faceAttributes.emotion.surprise > emotion_threshold) { emotions +=  "surprise, "; }
-      if (emotions.length > 0) {
-          console.log ("Emotions: " + emotions.slice (0, -2));
-      }
-      else {
-          console.log ("No emotions detected.");
-      }
 
       // get head pose
-      console.log("Head pose:");
-      console.log("  Pitch: " + face.faceAttributes.headPose.pitch);
-      console.log("  Roll: " + face.faceAttributes.headPose.roll);
-      console.log("  Yaw: " + face.faceAttributes.headPose.yaw);
+      let headPose = face.faceAttributes.headPose;
+      let absPitch = Math.abs(headPose.pitch);
+      let absRoll = Math.abs(headPose.roll);
+      let absYaw = Math.abs(headPose.yaw);
+      console.log("Abs p ", absPitch, ' r ', absRoll, ' y ', absYaw);
 
-      // TODO fix this once code is integrated together
-      // face.faceAttributes.headPose
-      let detectFace = false;
-      let pitch = 0;
-      let roll = 0;
-      let yaw = 0;
-
-      if (!detectFace || pitch > 45 || roll > 45 || yaw > 45) {
+      if (!detectFace || absPitch > 45 || absRoll > 45 || absYaw > 45) {
         this.state.beginTimer();
       }
-      if (detectFace && pitch <= 45 && roll <= 45 && yaw <= 45) {
+      if (detectFace && absPitch <= 45 && absRoll <= 45 && absYaw <= 45) {
         this.state.cancelTimer();
       }
     });
