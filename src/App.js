@@ -6,6 +6,7 @@ class App extends React.Component {
     super(props);
     this.detectFaces = this.detectFaces.bind(this);
     this.processFrame = this.processFrame.bind(this);
+    this.playBuzzer = this.playBuzzer.bind(this);
 
     // constants for Azure quickstart
     const msRest = require("@azure/ms-rest-js");
@@ -18,9 +19,14 @@ class App extends React.Component {
     const credentials = new msRest.ApiKeyCredentials({ inHeader: { 'Ocp-Apim-Subscription-Key': key } });
     const client = new Face.FaceClient(credentials, endpoint);
 
+    const beginTimer = () => setTimeout(this.playBuzzer, 30000);
+    const cancelTimer = () => clearTimeout(beginTimer);
+
     this.state = {
       image_base_url: "https://csdx.blob.core.windows.net/resources/Face/Images/",
-      client: client
+      client: client,
+      beginTimer: beginTimer,
+      cancelTimer: cancelTimer
     }
   }
 
@@ -30,6 +36,11 @@ class App extends React.Component {
 
   componentWillUnmount() {
     clearInterval(this.timer);
+  }
+
+  playBuzzer() {
+      const buzzer = new Audio("https://www.fesliyanstudios.com/play-mp3/4386");
+      buzzer.play();
   }
 
   monitorVideo() {
@@ -97,7 +108,7 @@ class App extends React.Component {
       );
     console.log (detectedFaces.length + " face(s) detected");
 
-    detectedFaces.forEach(async function (face) {
+    detectedFaces.forEach(async (face) => {
       // Get emotion on the face
       let emotions = "";
       let emotion_threshold = 0.0;
@@ -121,35 +132,22 @@ class App extends React.Component {
       console.log("  Pitch: " + face.faceAttributes.headPose.pitch);
       console.log("  Roll: " + face.faceAttributes.headPose.roll);
       console.log("  Yaw: " + face.faceAttributes.headPose.yaw);
+
+      // TODO fix this once code is integrated together
+      // face.faceAttributes.headPose
+      let detectFace = false;
+      let pitch = 0;
+      let roll = 0;
+      let yaw = 0;
+
+      if (!detectFace || pitch > 45 || roll > 45 || yaw > 45) {
+        this.state.beginTimer();
+      }
+      if (detectFace && pitch <= 45 && roll <= 45 && yaw <= 45) {
+        this.state.cancelTimer();
+      }
     });
   }
-
-  audioPrompt() {
-
-    function playBuzzer() {
-        const buzzer = new Audio("https://www.fesliyanstudios.com/play-mp3/4386");
-        buzzer.play();
-    }
-
-    let beginTimer = setTimeout(playBuzzer, 30000);
-
-    let cancelTimer = clearTimeout(beginTimer);
-
-    // TODO fix this once code is integrated together
-    // face.faceAttributes.headPose
-    let detectFace = false;
-    let pitch = 0;
-    let roll = 0;
-    let yaw = 0;
-
-    if (!detectFace || pitch > 45 || roll > 45 || yaw > 45) {
-        beginTimer();
-        if (detectFace && pitch <= 45 && roll <= 45 && yaw <= 45) {
-        cancelTimer();
-        }
-    }
-}
-
 
   render() {
     return (
