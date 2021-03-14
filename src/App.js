@@ -124,23 +124,30 @@ class App extends React.Component {
     });
   }
 
-  function audioPrompt() {
-   
+  audioPrompt() {
+
     function playBuzzer() {
         const buzzer = new Audio("https://www.fesliyanstudios.com/play-mp3/4386");
         buzzer.play();
     }
-    
+
     let beginTimer = setTimeout(playBuzzer, 30000);
-         
+
     let cancelTimer = clearTimeout(beginTimer);
-    
-    if (!detectFace || face.faceAttributes.headPose.pitch > 45 || face.faceAttributes.headPose.roll > 45 || face.faceAttributes.headPose.yaw > 45) {
-        beginTimer;
-        if (detectFace && face.faceAttributes.headPose.pitch <= 45 && face.faceAttributes.headPose.roll <= 45 && face.faceAttributes.headPose.yaw <= 45) {
-        cancelTimer; 
-        } 
-    }     
+
+    // TODO fix this once code is integrated together
+    // face.faceAttributes.headPose
+    let detectFace = false;
+    let pitch = 0;
+    let roll = 0;
+    let yaw = 0;
+
+    if (!detectFace || pitch > 45 || roll > 45 || yaw > 45) {
+        beginTimer();
+        if (detectFace && pitch <= 45 && roll <= 45 && yaw <= 45) {
+        cancelTimer();
+        }
+    }
 }
 
 
