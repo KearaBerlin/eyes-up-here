@@ -1,0 +1,4 @@
+{
+    "appService.defaultWebAppToDeploy": "/subscriptions/dec24551-55ee-494b-929d-3a43a319ed98/resourceGroups/Eyes-Up-Here/providers/Microsoft.Web/sites/eyesuphere2",
+    "appService.deploySubpath": "."
+}
