@@ -6,7 +6,6 @@ class App extends React.Component {
     super(props);
 
     window.alert("This app will play an alarm sound if it doesn't detect your face.");
-    this.playBuzzer();
 
     this.detectFaces = this.detectFaces.bind(this);
     this.processFrame = this.processFrame.bind(this);
@@ -52,8 +51,10 @@ class App extends React.Component {
   }
 
   playBuzzer() {
-      const buzzer = new Audio("https://www.fesliyanstudios.com/play-mp3/4386");
-      buzzer.play();
+    // https://www.fesliyanstudios.com/play-mp3/4386
+    // https://www.soundsnap.com/node/103344
+    const buzzer = new Audio('https://www.fesliyanstudios.com/play-mp3/6535');
+    buzzer.play();
   }
 
   monitorVideo() {
@@ -87,7 +88,7 @@ class App extends React.Component {
     // check ready state before grabbing frame to
     // avoid errors from too many frames grabbed quickly
     if (track.readyState === 'live' && track.enabled && !track.muted) {
-
+      
       // grab a still image from video track
       imageCapture.grabFrame()
       .then((imageBitmap) => {
