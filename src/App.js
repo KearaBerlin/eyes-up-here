@@ -4,6 +4,10 @@ import React from 'react';
 class App extends React.Component {
   constructor(props) {
     super(props);
+
+    window.alert("This app will play an alarm sound if it doesn't detect your face.");
+    this.playBuzzer();
+
     this.detectFaces = this.detectFaces.bind(this);
     this.processFrame = this.processFrame.bind(this);
     this.playBuzzer = this.playBuzzer.bind(this);
@@ -19,8 +23,17 @@ class App extends React.Component {
     const credentials = new msRest.ApiKeyCredentials({ inHeader: { 'Ocp-Apim-Subscription-Key': key } });
     const client = new Face.FaceClient(credentials, endpoint);
 
-    const beginTimer = () => setTimeout(this.playBuzzer, 30000);
-    const cancelTimer = () => clearTimeout(beginTimer);
+    const beginTimer = () => {
+      console.log('setting timeout');
+      setTimeout(() => {
+        console.log('buzz buzz!');
+        this.playBuzzer();
+      }, 5000);
+    }
+    const cancelTimer = () => {
+      console.log('cancelling timer');
+      clearTimeout(beginTimer);
+    }
 
     this.state = {
       image_base_url: "https://csdx.blob.core.windows.net/resources/Face/Images/",
@@ -109,8 +122,11 @@ class App extends React.Component {
     console.log (detectedFaces.length + " face(s) detected");
     const detectFace = detectedFaces.length > 0;
 
-    detectedFaces.forEach(async (face) => {
+    // for our purposes for now, we only expect to see 0 or 1 faces,
+    // so just get the first face in the list, if any.
+    const face = detectedFaces[0];
 
+    if(detectFace) {
       // get head pose
       let headPose = face.faceAttributes.headPose;
       let absPitch = Math.abs(headPose.pitch);
@@ -118,13 +134,17 @@ class App extends React.Component {
       let absYaw = Math.abs(headPose.yaw);
       console.log("Abs p ", absPitch, ' r ', absRoll, ' y ', absYaw);
 
-      if (!detectFace || absPitch > 45 || absRoll > 45 || absYaw > 45) {
+      if (absPitch > 45 || absRoll > 45 || absYaw > 45) {
         this.state.beginTimer();
       }
-      if (detectFace && absPitch <= 45 && absRoll <= 45 && absYaw <= 45) {
+      if (absPitch <= 45 && absRoll <= 45 && absYaw <= 45) {
+        console.log('face!');
         this.state.cancelTimer();
       }
-    });
+    } else {
+      console.log('no face');
+      this.state.beginTimer();
+    }
   }
 
   render() {
